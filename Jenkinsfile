@@ -1,33 +1,25 @@
 pipeline {
   agent any
   stages {
-    stage('verify installations') {
+    stage('checkout') {
       steps {
-        sh '''
-          php -v
-          phpunit --version
-        '''
+        git branch: 'main', url: 'https://github.com/FerdiRiyantoo/pipelineKSI.git'
       }
     }
-    stage('run tests') {
+    stage('Composer Install') {
       steps {
-        sh 'phpunit --bootstrap src/autoload.php tests'
+        sh 'composer install --no-interaction --prefer-dist'
       }
     }
-    stage ('run tests with TestDox') {
+    stage ('run PHPUnit tests') {
       steps {
-        sh 'phpunit --bootstrap src/autoload.php --testdox tests'
+        sh './vendor/bin/phpunit tests --testdox --colors=never --no-coverage'
       }
     }
-    stage ('run tests with JUnit results') {
+    stage ('Hello') {
       steps {
-        sh 'phpunit --bootstrap src/autoload.php --log-junit target/junit-results.xml tests'
+        echo 'Hello, Ferdi Riyanto!'
       }
-      post {
-        always {
-          junit testResults: 'target/*.xml'
-        }
       }
     }
   }
-}
